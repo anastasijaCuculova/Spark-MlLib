@@ -41,8 +41,24 @@ public class WineClassification {
         List<LabeledPoint> trainingParsedData = parseData(trainingData);
         List<LabeledPoint> testParsedData = parseData(testData);
         prepareDecisionTreeAlgorithm(context.parallelize(trainingParsedData), context.parallelize(testParsedData), testDoubleData, dataSet);
+    }
 
+    private static List<LabeledPoint> loadData(JavaSparkContext context) {
+        JavaRDD<String> javaRDD =
+                context.textFile(PATH_TO_FILE);
+        List<String[]> parts = javaRDD.map(line -> line.split(",")).collect();
 
+        List<LabeledPoint> parsedDataAsList = new ArrayList<>();
+        for (String[] part : parts) {
+            double[] doubleValues = new double[part.length];
+            for (int i = 0; i < part.length; i++) {
+                if (part[i] != null) {
+                    doubleValues[i] = new Double(part[i]);
+                }
+            }
+            parsedDataAsList.add(new LabeledPoint(doubleValues[0], Vectors.dense(doubleValues)));
+        }
+        return parsedDataAsList;
     }
 
     private static double[] parseDataToDouble(Object[] data) {
@@ -80,23 +96,5 @@ public class WineClassification {
             }
         }
         return Arrays.asList(result);
-    }
-
-    private static List<LabeledPoint> loadData(JavaSparkContext context) {
-        JavaRDD<String> javaRDD =
-                context.textFile(PATH_TO_FILE);
-        List<String[]> parts = javaRDD.map(line -> line.split(",")).collect();
-
-        List<LabeledPoint> parsedDataAsList = new ArrayList<>();
-        for (String[] part : parts) {
-            double[] doubleValues = new double[part.length];
-            for (int i = 0; i < part.length; i++) {
-                if (part[i] != null) {
-                    doubleValues[i] = new Double(part[i]);
-                }
-            }
-            parsedDataAsList.add(new LabeledPoint(doubleValues[0], Vectors.dense(doubleValues)));
-        }
-        return parsedDataAsList;
     }
 }
