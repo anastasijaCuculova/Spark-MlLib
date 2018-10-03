@@ -11,6 +11,10 @@ import org.apache.spark.sql.SparkSession;
 
 import java.util.*;
 
+/*
+ * The goal is to divide data in two data sets training and test set.
+ * After that data must be parsed in LabeledPoint and given to the algorithm to predict the classifier
+ * */
 public class WineClassification {
 
     private final static int SEVENTY_PERCENTS_OF_DATA = 70;
